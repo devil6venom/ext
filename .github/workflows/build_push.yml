@@ -73,18 +73,10 @@ jobs:
         with:
           cache-read-only: ${{ matrix.chunk.number > 1 }}
 
-      - name: Prepare signing key
-        run: |
-          echo ${{ secrets.SIGNING_KEY }} | base64 -d > signingkey.jks
 
       - name: Build extensions (${{ matrix.chunk.number }})
         env:
           MODULES: ${{ join(matrix.chunk.modules, ' ') }}
-          ALIAS: ${{ secrets.ALIAS }}
-          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          ./gradlew $MODULES
 
       - name: Upload APKs (${{ matrix.chunk.number }})
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -94,8 +86,7 @@ jobs:
           path: "**/*.apk"
           retention-days: 1
 
-      - name: Clean up CI files
-        run: rm signingkey.jks
+    
 
   publish:
     name: Publish extension repo
